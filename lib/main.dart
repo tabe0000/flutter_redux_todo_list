@@ -28,13 +28,8 @@ void main() async {
   DbProvider _dbProvider = DbProvider();
   Database db = await _dbProvider.db;
 
-  final String task = "take coffee";
-  final String sql = "INSERT INTO TodoList(task) VALUES('$task')";
-  final int _ = await db.rawInsert(sql);
   List<Map<String, dynamic>> list = await db.rawQuery("select * from TodoList");
   print(list);
-  print(list[0]["task"]);
-  print(list[0]["id"]);
 
   runApp(MyApp(store));
 }
@@ -128,12 +123,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         content: TextField(
                             controller: _textFieldController,
                             decoration: InputDecoration(
-                                hintText: store.state.todoTasks[editTaskIndex]),
+                                hintText: store.state.todoTasks[editTaskIndex]["task"]),
                             onSubmitted: (task) {
                               store.dispatch(EditTaskAction(
                                   editedTask: task,
                                   editedTaskId:
-                                      store.state.todoTasks[editTaskIndex].id));
+                                      store.state.todoTasks[editTaskIndex]["id"]));
                               _textFieldController.clear();
                               Navigator.of(context).pop();
                             }),
@@ -151,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               store.dispatch(EditTaskAction(
                                   editedTask: _textFieldController.text,
                                   editedTaskId:
-                                      store.state.todoTasks[editTaskIndex].id));
+                                      store.state.todoTasks[editTaskIndex]["id"]));
                               _textFieldController.clear();
                               Navigator.of(context).pop();
                             },
@@ -178,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               store.dispatch(DeleteTaskAction(
                                   deleteId:
-                                      store.state.todoTasks[doneTaskIndex].id));
+                                      store.state.todoTasks[doneTaskIndex]["id"]));
                               Navigator.of(context).pop();
                             },
                           )
@@ -247,11 +242,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         break;
                       case PopupMenuAction.DELETE:
                         store.dispatch(
-                            DeleteTaskAction(deleteId: todoTasks[index].id));
+                            DeleteTaskAction(deleteId: todoTasks[index]["id"]));
                         break;
                     }
                   }),
-                  title: Text(todoTasks[index]),
+                  title: Text(todoTasks[index]["task"]),
                 );
               }),
         )),

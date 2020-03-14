@@ -23,8 +23,4 @@ class DbProvider {
       newDb.execute("CREATE TABLE TodoList(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT)");
     });
   }
-
-  void printDB() {
-    print(_db.query("TodoList"));
-  }
 }

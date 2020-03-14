@@ -10,7 +10,7 @@ void middleware(Store<AppState> store, action, NextDispatcher next) async {
   print("$action を実行するよ!");
   if (action is AddTaskAction) {
     Database db = await DbProvider().db;
-    final String sql = "INSERT INTO TodoList (task) VALUES (${action.newTask})";
+    final String sql = "INSERT INTO TodoList(task) VALUES ('${action.newTask}')";
     db.execute(sql);
     final String getLastRecordSql =
         "SELECT * FROM TodoList WHERE ROWID = last_insert_rowid()";
@@ -27,7 +27,7 @@ void middleware(Store<AppState> store, action, NextDispatcher next) async {
   } else if (action is EditTaskAction) {
     Database db = await DbProvider().db;
     final String updateSql =
-        "UPDATE TodoList SET fuga='${action.editedTask}' WHERE id=${action.editedTaskId}";
+        "UPDATE TodoList SET task='${action.editedTask}' WHERE id=${action.editedTaskId}";
     db.rawUpdate(updateSql);
     final List<Map<String, dynamic>> result =
         await db.rawQuery("SELECT * FROM TodoList");
