@@ -31,16 +31,12 @@ void main() async {
   var reducer;
   Store<AppState> store = Store(reducer, initialState: AppState([]));
   DbProvider _dbProvider = DbProvider();
-  //2. StoreのTodoListを更新
-  //SyncAction => SyncReducer
-  _dbProvider.init();
   Database db = await _dbProvider.db;
 
   final String task = "take coffee";
   final String sql = "INSERT INTO TodoList(task) VALUES('$task')";
   final int _ = await db.rawInsert(sql);
-  List<Map<String, dynamic>> list =
-      await db.rawQuery("select * from TodoList");
+  List<Map<String, dynamic>> list = await db.rawQuery("select * from TodoList");
   print(list);
   print(list[0]["task"]);
   print(list[0]["id"]);
@@ -87,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return showDialog(
         context: context,
         builder: (context) {
-          return StoreProvider(
+          return StoreProvider<AppState>(
               store: store,
               child: StoreConnector(
                   converter: (Store<AppState> store) => store,
@@ -205,7 +201,13 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: DBの初期化
     print("initState");
     _dbProvider = DbProvider();
-    //store.dispatch(SyncTaskAction());
+    try {
+      store.dispatch(SyncTaskAction());
+    } catch (e) {
+      print(e);
+    }
+
+
     super.initState();
   }
 
@@ -233,7 +235,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   leading: const Icon(Icons.comment),
                   trailing:
                       PopupMenuButton(itemBuilder: (BuildContext context) {
-                    return _menu.indexedMap((i, s) {
+                    return _menu.map((s) {
                       return PopupMenuItem(
                         child: Text(s.toString().toUpperCase().split('.').last),
                         value: s,
@@ -264,15 +266,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-}
-
-extension IndexedMap<T, E> on List<T> {
-  List<E> indexedMap<E>(E Function(int index, T item) function) {
-    List<E> list = [];
-    this.asMap().forEach((index, element) {
-      list.add(function(index, element));
-    });
-    return list;
   }
 }

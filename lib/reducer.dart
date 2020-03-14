@@ -6,6 +6,7 @@ import 'action.dart';
 
 //Reducer
 Future<AppState> reducer(AppState prev, action) async {
+  print("I am SyncTaskAction");
   print(action);
   if (action is AddTaskAction) {
     return AppState(await addTaskReducer(prev, action.newTask));
@@ -14,6 +15,8 @@ Future<AppState> reducer(AppState prev, action) async {
   } else if (action is EditTaskAction) {
     return AppState(
         await editTaskReducer(prev, action.editedTask, action.editedTaskId));
+  } else if (action is SyncTaskAction) {
+    return AppState(await syncTaskReducer(prev));
   }
 }
 
@@ -55,6 +58,7 @@ Future<List<Map<String, dynamic>>> editTaskReducer(
 }
 
 Future<List<Map<String, dynamic>>> syncTaskReducer(AppState prev) async {
+  print("i'm sync reducer");
   Database db = await DbProvider().db;
   final List<Map<String, dynamic>> result =
       await db.rawQuery("SELECT * FROM TodoList");

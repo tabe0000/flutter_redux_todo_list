@@ -17,5 +17,5 @@ class EditTaskAction {
 
 class SyncTaskAction {
   //property nothing
+  SyncTaskAction();
 }
-
