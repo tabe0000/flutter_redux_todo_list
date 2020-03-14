@@ -43,11 +43,13 @@ Future<List<Map<String, dynamic>>> deleteTaskReducer(
   return []..addAll(result);
 }
 
-List<Map<String, dynamic>> editTaskReducer(
-    AppState prev, String editedTask, int editedTaskIndex) {
-  List<String> newList = [];
-  newList.addAll(prev.todoTasks);
-  print(newList);
-  newList[editedTaskIndex] = editedTask;
-  return newList;
+Future<List<Map<String, dynamic>>> editTaskReducer(
+    AppState prev, String editedTask, int editedTaskId) async {
+  Database db = await DbProvider().db;
+  final String updateSql =
+      "UPDATE TodoList SET fuga='$editedTask' WHERE id=$editedTaskId";
+  db.rawUpdate(updateSql);
+  final List<Map<String, dynamic>> result =
+      await db.rawQuery("SELECT * FROM TodoList");
+  return result;
 }
