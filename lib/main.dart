@@ -198,21 +198,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: DBの初期化
     print("initState");
     _dbProvider = DbProvider();
-    try {
-      store.dispatch(SyncTaskAction());
-    } catch (e) {
-      print(e);
-    }
-
-
+    store.dispatch(SyncTaskAction());
     super.initState();
   }
-
-  void getDB() async {
-    db = await _dbProvider.db;
-  }
-
-  hoge() async {}
 
   @override
   Widget build(BuildContext context) {
