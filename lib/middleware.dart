@@ -7,7 +7,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 void middleware(Store<AppState> store, action, NextDispatcher next) async {
-  print("$action を実行するよ!");
   if (action is AddTaskAction) {
     Database db = await DbProvider().db;
     final String sql = "INSERT INTO TodoList(task) VALUES ('${action.newTask}')";
@@ -37,7 +36,6 @@ void middleware(Store<AppState> store, action, NextDispatcher next) async {
     final List<Map<String, dynamic>> result =
         await db.rawQuery("SELECT * FROM TodoList");
     action.result = result;
-    print("無事DB処理が終わったよ！");
     print(action.result is List<Map<String, dynamic>>);
   }
   next(action);
