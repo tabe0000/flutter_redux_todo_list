@@ -32,10 +32,15 @@ Future<List<Map<String, dynamic>>> addTaskReducer(
     ..add(newRecord[0]);
 }
 
-List<Map<String, dynamic>> deleteTaskReducer(AppState prev, int deleteIndex) {
-  return []
-    ..addAll(prev.todoTasks)
-    ..removeAt(deleteIndex);
+Future<List<Map<String, dynamic>>> deleteTaskReducer(
+    AppState prev, int deleteId) async {
+  Database db = await DbProvider().db;
+  final String deleteSql = "DELETE FROM TodoList WHERE id=$deleteId";
+  final int _ = await db.rawDelete(deleteSql);
+
+  final List<Map<String, dynamic>> result =
+      await db.rawQuery("SELECT * FROM TodoList");
+  return []..addAll(result);
 }
 
 List<Map<String, dynamic>> editTaskReducer(
