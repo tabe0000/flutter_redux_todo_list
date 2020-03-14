@@ -1,3 +1,6 @@
+import 'package:learn_sqlite/db_provider.dart';
+import 'package:sqflite/sqflite.dart';
+
 import 'main.dart';
 import 'action.dart';
 
@@ -11,14 +14,22 @@ AppState reducer(AppState prev, action) {
   } else if (action is EditTaskAction) {
     return AppState(
         editTaskReducer(prev, action.editedTask, action.editedTaskIndex));
-  } 
+  }
 }
 
-List<Map<String, dynamic>> addTaskReducer(AppState prev, String newTask) {
-  
+Future<List<Map<String, dynamic>>> addTaskReducer(
+    AppState prev, String newTask) async {
+  Database db = await DbProvider().db;
+  final String sql = "INSERT INTO TodoList (task) VALUES ($newTask)";
+  db.execute(sql);
+  final String getLastRecordSql =
+      "SELECT * FROM TodoList WHERE ROWID = last_insert_rowid()";
+  final List<Map<String, dynamic>> newRecord =
+      await db.rawQuery(getLastRecordSql);
+
   return []
     ..addAll(prev.todoTasks)
-    ..add(newTask);
+    ..add(newRecord[0]);
 }
 
 List<Map<String, dynamic>> deleteTaskReducer(AppState prev, int deleteIndex) {
