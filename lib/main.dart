@@ -148,7 +148,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _displayEditDialog(
       BuildContext context, Store<AppState> store, int editTaskIndex) async {
-    TextEditingController _textEC = TextEditingController();
     return showDialog(
         context: context,
         builder: (context) {
@@ -159,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   builder: (context, store) => AlertDialog(
                         title: Text('Edit Task'),
                         content: TextField(
-                            controller: _textEC,
+                            controller: _textFieldController,
                             decoration: InputDecoration(
                                 hintText: store.state.todoTasks[editTaskIndex]),
                             onSubmitted: (task) {
@@ -180,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Text("UPDATE"),
                             onPressed: () {
                               store.dispatch(EditTaskAction(
-                                  editedTask: _textEC.text,
+                                  editedTask: _textFieldController.text,
                                   editedTaskIndex: editTaskIndex));
                               Navigator.of(context).pop();
                             },
@@ -192,7 +191,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _displayDoneDialog(
       BuildContext context, Store<AppState> store, int doneTaskIndex) async {
-    TextEditingController _textEC = TextEditingController();
     return showDialog(
         context: context,
         builder: (context) {
