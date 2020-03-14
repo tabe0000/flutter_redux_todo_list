@@ -30,6 +30,10 @@ void main() {
   runApp(MyApp());
 }
 
+dynamic getReducer() {
+  return reducer;
+}
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -54,8 +58,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Store<AppState> store =
-      Store(reducer, initialState: AppState([]));
+  Store<AppState> store = Store(getReducer(), initialState: AppState([]));
 
   TextEditingController _textFieldController = TextEditingController();
   var _menu = [
@@ -122,7 +125,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             onSubmitted: (task) {
                               store.dispatch(EditTaskAction(
                                   editedTask: task,
-                                  editedTaskIndex: editTaskIndex));
+                                  editedTaskId:
+                                      store.state.todoTasks[editTaskIndex].id));
                               _textFieldController.clear();
                               Navigator.of(context).pop();
                             }),
@@ -139,7 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               store.dispatch(EditTaskAction(
                                   editedTask: _textFieldController.text,
-                                  editedTaskIndex: editTaskIndex));
+                                  editedTaskId:
+                                      store.state.todoTasks[editTaskIndex].id));
                               _textFieldController.clear();
                               Navigator.of(context).pop();
                             },
@@ -164,8 +169,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           FlatButton(
                             child: Text("OK"),
                             onPressed: () {
-                              store.dispatch(
-                                  DeleteTaskAction(deleteIndex: doneTaskIndex));
+                              store.dispatch(DeleteTaskAction(
+                                  deleteId:
+                                      store.state.todoTasks[doneTaskIndex].id));
                               Navigator.of(context).pop();
                             },
                           )
@@ -195,7 +201,6 @@ class _MyHomePageState extends State<MyHomePage> {
     db = await _dbProvider.db;
     //2. StoreのTodoListを更新
     //SyncAction => SyncReducer
-    
   }
 
   void getDB() async {
@@ -213,9 +218,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print(list[0]["task"]);
     print(list[0]["id"]);
   }
-
-  //dbとstoreを同期
-  Database syncDbAndStore(Database _db, Store _store) {}
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +253,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         _displayEditDialog(context, store, index);
                         break;
                       case PopupMenuAction.DELETE:
-                        store.dispatch(DeleteTaskAction(deleteIndex: index));
+                        store.dispatch(
+                            DeleteTaskAction(deleteId: todoTasks[index].id));
                         break;
                     }
                   }),

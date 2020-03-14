@@ -5,14 +5,17 @@ class AddTaskAction {
 }
 
 class DeleteTaskAction {
-  final int deleteIndex;
-  DeleteTaskAction({this.deleteIndex});
+  final int deleteId;
+  DeleteTaskAction({this.deleteId});
 }
 
 class EditTaskAction {
   final String editedTask;
-  final int editedTaskIndex;
-  EditTaskAction({this.editedTask, this.editedTaskIndex});
+  final int editedTaskId;
+  EditTaskAction({this.editedTask, this.editedTaskId});
 }
 
+class SyncTaskAction {
+  //property nothing
+}
 

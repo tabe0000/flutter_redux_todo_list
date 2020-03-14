@@ -10,10 +10,10 @@ Future<AppState> reducer(AppState prev, action) async {
   if (action is AddTaskAction) {
     return AppState(await addTaskReducer(prev, action.newTask));
   } else if (action is DeleteTaskAction) {
-    return AppState(await deleteTaskReducer(prev, action.deleteIndex));
+    return AppState(await deleteTaskReducer(prev, action.deleteId));
   } else if (action is EditTaskAction) {
     return AppState(
-        await editTaskReducer(prev, action.editedTask, action.editedTaskIndex));
+        await editTaskReducer(prev, action.editedTask, action.editedTaskId));
   }
 }
 
