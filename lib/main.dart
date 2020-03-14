@@ -182,11 +182,19 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: DBの初期化
     print("initState");
     _dbProvider = DbProvider();
-    getDB();
-    hoge();
-    //_dbProvider.printDB();
+
+    //storeとsql同期
+    syncDB();
 
     super.initState();
+  }
+
+  void syncDB() async {
+    //1. dbを取得
+    db = await _dbProvider.db;
+    //2. StoreのTodoListを更新
+    //SyncAction => SyncReducer
+    
   }
 
   void getDB() async {
@@ -196,8 +204,6 @@ class _MyHomePageState extends State<MyHomePage> {
   hoge() async {
     db = await _dbProvider.db;
     final String task = "take coffee";
-    //Map<String, dynamic> record = {'task': task};
-    //final result = await (db.insert("TodoList", record));
     final String sql = "INSERT INTO TodoList(task) VALUES('take coffee')";
     final int result = await db.rawInsert(sql);
     List<Map<String, dynamic>> list =

@@ -1,19 +1,17 @@
 import 'main.dart';
 import 'action.dart';
 
-
 //Reducer
 AppState reducer(AppState prev, action) {
   print(action);
   if (action is AddTaskAction) {
     return AppState(addTaskReducer(prev, action.newTask));
   } else if (action is DeleteTaskAction) {
-    print("im deleteAction");
     return AppState(deleteTaskReducer(prev, action.deleteIndex));
   } else if (action is EditTaskAction) {
     return AppState(
         editTaskReducer(prev, action.editedTask, action.editedTaskIndex));
-  }
+  } 
 }
 
 List<String> addTaskReducer(AppState prev, String newTask) {

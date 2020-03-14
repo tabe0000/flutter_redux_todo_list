@@ -14,3 +14,5 @@ class EditTaskAction {
   final int editedTaskIndex;
   EditTaskAction({this.editedTask, this.editedTaskIndex});
 }
+
+
