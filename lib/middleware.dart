@@ -1,9 +1,7 @@
 import 'main.dart';
 import 'action.dart';
-import 'reducer.dart';
 import 'db_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 void middleware(Store<AppState> store, action, NextDispatcher next) async {

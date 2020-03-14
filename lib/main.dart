@@ -1,3 +1,10 @@
+// redux.dart | MIT License | https://github.com/johnpryan/redux.dart/blob/master/LICENSE
+// flutter_redux | MIT License | https://github.com/brianegan/flutter_redux/blob/master/LICENSE
+// sqflite | MIT License | https://github.com/tekartik/sqflite/blob/master/sqflite/LICENSE
+// path | BSD License | https://github.com/dart-lang/path/blob/master/LICENSE
+// path_provider | BSD License | https://github.com/flutter/plugins/blob/master/packages/path_provider/path_provider/LICENSE
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
