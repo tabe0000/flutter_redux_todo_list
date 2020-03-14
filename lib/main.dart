@@ -14,7 +14,7 @@ import 'db_provider.dart';
 
 @immutable
 class AppState {
-  final List<String> todoTasks;
+  final List<Map<String, dynamic>> todoTasks;
   AppState(this.todoTasks);
 }
 
