@@ -10,6 +10,13 @@ class AppState {
   AppState(this.todoTasks);
 }
 
+enum PopupMenuAction {
+  DONE,
+  EDIT,
+  DELETE,
+}
+
+//Action
 class AddTaskAction {
   final String newTask;
   AddTaskAction({this.newTask});
@@ -20,13 +27,23 @@ class DeleteTaskAction {
   DeleteTaskAction({this.deleteIndex});
 }
 
+class EditTaskAction {
+  final String editedTask;
+  final int editedTaskIndex;
+  EditTaskAction({this.editedTask, this.editedTaskIndex});
+}
+
+//Reducer
 AppState reducer(AppState prev, action) {
+  print(action);
   if (action is AddTaskAction) {
-    print("im add action reducer.");
-    print(action.newTask);
     return AppState(addTaskReducer(prev, action.newTask));
-  }else if(action is DeleteTaskAction) {
+  } else if (action is DeleteTaskAction) {
+    print("im deleteAction");
     return AppState(deleteTaskReducer(prev, action.deleteIndex));
+  } else if (action is EditTaskAction) {
+    return AppState(
+        editTaskReducer(prev, action.editedTask, action.editedTaskIndex));
   }
 }
 
@@ -42,6 +59,16 @@ List<String> deleteTaskReducer(AppState prev, int deleteIndex) {
     ..removeAt(deleteIndex);
 }
 
+List<String> editTaskReducer(
+    AppState prev, String editedTask, int editedTaskIndex) {
+  List<String> newList = [];
+  newList.addAll(prev.todoTasks);
+  print(newList);
+  newList[editedTaskIndex] = editedTask;
+  return newList;
+}
+
+//View
 void main() {
   runApp(MyApp());
 }
@@ -51,11 +78,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Redux todo list',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.grey,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Redux Todo List'),
     );
   }
 }
@@ -73,7 +100,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Store<AppState> store =
       Store(reducer, initialState: AppState(["take coffee"]));
   TextEditingController _textFieldController = TextEditingController();
-  var _menu = ["delete"];
+  var _menu = [
+    PopupMenuAction.DONE,
+    PopupMenuAction.EDIT,
+    PopupMenuAction.DELETE
+  ];
 
   _displayAddDialog(BuildContext context, Store<AppState> store) async {
     return showDialog(
@@ -91,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 InputDecoration(hintText: "add task ..."),
                             onSubmitted: (task) {
                               store.dispatch(AddTaskAction(newTask: task));
-                                Navigator.of(context).pop();
+                              Navigator.of(context).pop();
                             }),
                         actions: <Widget>[
                           new FlatButton(
@@ -107,6 +138,76 @@ class _MyHomePageState extends State<MyHomePage> {
                               store.dispatch(AddTaskAction(
                                   newTask: _textFieldController.text));
                               _textFieldController.clear();
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      )));
+        });
+  }
+
+  _displayEditDialog(
+      BuildContext context, Store<AppState> store, int editTaskIndex) async {
+    TextEditingController _textEC = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return StoreProvider(
+              store: store,
+              child: StoreConnector(
+                  converter: (Store<AppState> store) => store,
+                  builder: (context, store) => AlertDialog(
+                        title: Text('Edit Task'),
+                        content: TextField(
+                            controller: _textEC,
+                            decoration: InputDecoration(
+                                hintText: store.state.todoTasks[editTaskIndex]),
+                            onSubmitted: (task) {
+                              store.dispatch(EditTaskAction(
+                                  editedTask: task,
+                                  editedTaskIndex: editTaskIndex));
+                              Navigator.of(context).pop();
+                            }),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text('CANCEL'),
+                            onPressed: () {
+                              _textFieldController.clear();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          FlatButton(
+                            child: Text("UPDATE"),
+                            onPressed: () {
+                              store.dispatch(EditTaskAction(
+                                  editedTask: _textEC.text,
+                                  editedTaskIndex: editTaskIndex));
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      )));
+        });
+  }
+
+  _displayDoneDialog(
+      BuildContext context, Store<AppState> store, int doneTaskIndex) async {
+    TextEditingController _textEC = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return StoreProvider(
+              store: store,
+              child: StoreConnector(
+                  converter: (Store<AppState> store) => store,
+                  builder: (context, store) => AlertDialog(
+                        title: Text('Congraturation!!!'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("OK"),
+                            onPressed: () {
+                              store.dispatch(
+                                  DeleteTaskAction(deleteIndex: doneTaskIndex));
                               Navigator.of(context).pop();
                             },
                           )
@@ -131,17 +232,28 @@ class _MyHomePageState extends State<MyHomePage> {
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   leading: const Icon(Icons.comment),
-                  trailing: PopupMenuButton(
-                      itemBuilder: (BuildContext context) {
-                        return _menu.indexedMap((i, s) {
-                          return PopupMenuItem(
-                            child: Text(s),
-                            value: s,
-                          );
-                        }).toList();
-                      },
-                      onSelected: (v) =>
-                          store.dispatch(DeleteTaskAction(deleteIndex: index))),
+                  trailing:
+                      PopupMenuButton(itemBuilder: (BuildContext context) {
+                    return _menu.indexedMap((i, s) {
+                      return PopupMenuItem(
+                        child: Text(s.toString().toUpperCase().split('.').last),
+                        value: s,
+                      );
+                    }).toList();
+                  }, onSelected: (v) {
+                    print(v);
+                    switch (v) {
+                      case PopupMenuAction.DONE:
+                        _displayDoneDialog(context, store, index);
+                        break;
+                      case PopupMenuAction.EDIT:
+                        _displayEditDialog(context, store, index);
+                        break;
+                      case PopupMenuAction.DELETE:
+                        store.dispatch(DeleteTaskAction(deleteIndex: index));
+                        break;
+                    }
+                  }),
                   title: Text(todoTasks[index]),
                 );
               }),
