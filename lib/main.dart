@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:meta/meta.dart';
-import 'package:flutter/rendering.dart';
 import 'action.dart';
-import 'reducer.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:async';
-import 'dart:io';
 import 'db_provider.dart';
+import 'middleware.dart';
 
 @immutable
 class AppState {
@@ -29,7 +24,7 @@ enum PopupMenuAction {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var reducer;
-  Store<AppState> store = Store(reducer, initialState: AppState([]));
+  Store<AppState> store = Store(reducer, initialState: AppState([]), middleware: [middleware]);
   DbProvider _dbProvider = DbProvider();
   Database db = await _dbProvider.db;
 
