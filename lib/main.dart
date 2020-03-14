@@ -6,6 +6,7 @@ import 'action.dart';
 import 'package:sqflite/sqflite.dart';
 import 'db_provider.dart';
 import 'middleware.dart';
+import 'reducer.dart';
 
 @immutable
 class AppState {
@@ -23,7 +24,6 @@ enum PopupMenuAction {
 //View
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var reducer;
   Store<AppState> store = Store(reducer, initialState: AppState([]), middleware: [middleware]);
   DbProvider _dbProvider = DbProvider();
   Database db = await _dbProvider.db;
