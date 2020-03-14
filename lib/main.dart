@@ -3,6 +3,14 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:meta/meta.dart';
 import 'package:flutter/rendering.dart';
+import 'action.dart';
+import 'reducer.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:async';
+import 'dart:io';
+import 'db_provider.dart';
 
 @immutable
 class AppState {
@@ -14,58 +22,6 @@ enum PopupMenuAction {
   DONE,
   EDIT,
   DELETE,
-}
-
-//Action
-class AddTaskAction {
-  final String newTask;
-  AddTaskAction({this.newTask});
-}
-
-class DeleteTaskAction {
-  final int deleteIndex;
-  DeleteTaskAction({this.deleteIndex});
-}
-
-class EditTaskAction {
-  final String editedTask;
-  final int editedTaskIndex;
-  EditTaskAction({this.editedTask, this.editedTaskIndex});
-}
-
-//Reducer
-AppState reducer(AppState prev, action) {
-  print(action);
-  if (action is AddTaskAction) {
-    return AppState(addTaskReducer(prev, action.newTask));
-  } else if (action is DeleteTaskAction) {
-    print("im deleteAction");
-    return AppState(deleteTaskReducer(prev, action.deleteIndex));
-  } else if (action is EditTaskAction) {
-    return AppState(
-        editTaskReducer(prev, action.editedTask, action.editedTaskIndex));
-  }
-}
-
-List<String> addTaskReducer(AppState prev, String newTask) {
-  return []
-    ..addAll(prev.todoTasks)
-    ..add(newTask);
-}
-
-List<String> deleteTaskReducer(AppState prev, int deleteIndex) {
-  return []
-    ..addAll(prev.todoTasks)
-    ..removeAt(deleteIndex);
-}
-
-List<String> editTaskReducer(
-    AppState prev, String editedTask, int editedTaskIndex) {
-  List<String> newList = [];
-  newList.addAll(prev.todoTasks);
-  print(newList);
-  newList[editedTaskIndex] = editedTask;
-  return newList;
 }
 
 //View
@@ -99,6 +55,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Store<AppState> store =
       Store(reducer, initialState: AppState(["take coffee"]));
+
   TextEditingController _textFieldController = TextEditingController();
   var _menu = [
     PopupMenuAction.DONE,
@@ -215,6 +172,43 @@ class _MyHomePageState extends State<MyHomePage> {
                       )));
         });
   }
+
+  DbProvider _dbProvider;
+  Database db;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // TODO: DBの初期化
+    print("initState");
+    _dbProvider = DbProvider();
+    getDB();
+    hoge();
+    //_dbProvider.printDB();
+
+    super.initState();
+  }
+
+  void getDB() async {
+    db = await _dbProvider.db;
+  }
+
+  hoge() async {
+    db = await _dbProvider.db;
+    final String task = "take coffee";
+    //Map<String, dynamic> record = {'task': task};
+    //final result = await (db.insert("TodoList", record));
+    final String sql = "INSERT INTO TodoList(task) VALUES('take coffee')";
+    final int result = await db.rawInsert(sql);
+    List<Map<String, dynamic>> list =
+        await db.rawQuery("select * from TodoList");
+    print(list);
+    print(list[0]["task"]);
+    print(list[0]["id"]);
+  }
+
+  //dbとstoreを同期
+  Database syncDbAndStore(Database _db, Store _store) {}
 
   @override
   Widget build(BuildContext context) {
