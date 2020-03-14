@@ -54,7 +54,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Store<AppState> store =
-      Store(reducer, initialState: AppState(["take coffee"]));
+      Store(reducer, initialState: AppState([]));
 
   TextEditingController _textFieldController = TextEditingController();
   var _menu = [

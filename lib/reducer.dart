@@ -14,19 +14,20 @@ AppState reducer(AppState prev, action) {
   } 
 }
 
-List<String> addTaskReducer(AppState prev, String newTask) {
+List<Map<String, dynamic>> addTaskReducer(AppState prev, String newTask) {
+  
   return []
     ..addAll(prev.todoTasks)
     ..add(newTask);
 }
 
-List<String> deleteTaskReducer(AppState prev, int deleteIndex) {
+List<Map<String, dynamic>> deleteTaskReducer(AppState prev, int deleteIndex) {
   return []
     ..addAll(prev.todoTasks)
     ..removeAt(deleteIndex);
 }
 
-List<String> editTaskReducer(
+List<Map<String, dynamic>> editTaskReducer(
     AppState prev, String editedTask, int editedTaskIndex) {
   List<String> newList = [];
   newList.addAll(prev.todoTasks);
