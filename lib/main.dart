@@ -26,15 +26,31 @@ enum PopupMenuAction {
 }
 
 //View
-void main() {
-  runApp(MyApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var reducer;
+  Store<AppState> store = Store(reducer, initialState: AppState([]));
+  DbProvider _dbProvider = DbProvider();
+  //2. StoreのTodoListを更新
+  //SyncAction => SyncReducer
+  _dbProvider.init();
+  Database db = await _dbProvider.db;
 
-dynamic getReducer() {
-  return reducer;
+  final String task = "take coffee";
+  final String sql = "INSERT INTO TodoList(task) VALUES('$task')";
+  final int _ = await db.rawInsert(sql);
+  List<Map<String, dynamic>> list =
+      await db.rawQuery("select * from TodoList");
+  print(list);
+  print(list[0]["task"]);
+  print(list[0]["id"]);
+
+  runApp(MyApp(store));
 }
 
 class MyApp extends StatelessWidget {
+  MyApp(this.store);
+  final Store store;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -43,23 +59,23 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
-      home: MyHomePage(title: 'Redux Todo List'),
+      home: MyHomePage(title: 'Redux Todo List', store: store),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title, this.store}) : super(key: key);
 
   final String title;
-
+  final Store<AppState> store;
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState(store);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Store<AppState> store = Store(getReducer(), initialState: AppState([]));
-
+  _MyHomePageState(this.store);
+  Store<AppState> store;
   TextEditingController _textFieldController = TextEditingController();
   var _menu = [
     PopupMenuAction.DONE,
@@ -189,35 +205,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: DBの初期化
     print("initState");
     _dbProvider = DbProvider();
-
-    //storeとsql同期
-    syncDB();
-
+    //store.dispatch(SyncTaskAction());
     super.initState();
-  }
-
-  void syncDB() async {
-    //1. dbを取得
-    db = await _dbProvider.db;
-    //2. StoreのTodoListを更新
-    //SyncAction => SyncReducer
   }
 
   void getDB() async {
     db = await _dbProvider.db;
   }
 
-  hoge() async {
-    db = await _dbProvider.db;
-    final String task = "take coffee";
-    final String sql = "INSERT INTO TodoList(task) VALUES('take coffee')";
-    final int result = await db.rawInsert(sql);
-    List<Map<String, dynamic>> list =
-        await db.rawQuery("select * from TodoList");
-    print(list);
-    print(list[0]["task"]);
-    print(list[0]["id"]);
-  }
+  hoge() async {}
 
   @override
   Widget build(BuildContext context) {
