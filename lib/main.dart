@@ -165,6 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               store.dispatch(EditTaskAction(
                                   editedTask: task,
                                   editedTaskIndex: editTaskIndex));
+                              _textFieldController.clear();
                               Navigator.of(context).pop();
                             }),
                         actions: <Widget>[
@@ -181,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               store.dispatch(EditTaskAction(
                                   editedTask: _textFieldController.text,
                                   editedTaskIndex: editTaskIndex));
+                              _textFieldController.clear();
                               Navigator.of(context).pop();
                             },
                           )
