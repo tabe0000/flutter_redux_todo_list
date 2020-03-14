@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:meta/meta.dart';
+import 'package:flutter/rendering.dart';
 
 @immutable
 class AppState {
@@ -14,11 +15,18 @@ class AddTaskAction {
   AddTaskAction({this.newTask});
 }
 
+class DeleteTaskAction {
+  final int deleteIndex;
+  DeleteTaskAction({this.deleteIndex});
+}
+
 AppState reducer(AppState prev, action) {
   if (action is AddTaskAction) {
     print("im add action reducer.");
     print(action.newTask);
     return AppState(addTaskReducer(prev, action.newTask));
+  }else if(action is DeleteTaskAction) {
+    return AppState(deleteTaskReducer(prev, action.deleteIndex));
   }
 }
 
@@ -26,6 +34,12 @@ List<String> addTaskReducer(AppState prev, String newTask) {
   return []
     ..addAll(prev.todoTasks)
     ..add(newTask);
+}
+
+List<String> deleteTaskReducer(AppState prev, int deleteIndex) {
+  return []
+    ..addAll(prev.todoTasks)
+    ..removeAt(deleteIndex);
 }
 
 void main() {
@@ -59,8 +73,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Store<AppState> store =
       Store(reducer, initialState: AppState(["take coffee"]));
   TextEditingController _textFieldController = TextEditingController();
+  var _menu = ["delete"];
 
-  _displayDialog(BuildContext context, Store<AppState> store) async {
+  _displayAddDialog(BuildContext context, Store<AppState> store) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -74,8 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             controller: _textFieldController,
                             decoration:
                                 InputDecoration(hintText: "add task ..."),
-                            onSubmitted: (task) => 
-                                store.dispatch(AddTaskAction(newTask: task))),
+                            onSubmitted: (task) {
+                              store.dispatch(AddTaskAction(newTask: task));
+                                Navigator.of(context).pop();
+                            }),
                         actions: <Widget>[
                           new FlatButton(
                             child: new Text('CANCEL'),
@@ -114,16 +131,36 @@ class _MyHomePageState extends State<MyHomePage> {
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   leading: const Icon(Icons.comment),
+                  trailing: PopupMenuButton(
+                      itemBuilder: (BuildContext context) {
+                        return _menu.indexedMap((i, s) {
+                          return PopupMenuItem(
+                            child: Text(s),
+                            value: s,
+                          );
+                        }).toList();
+                      },
+                      onSelected: (v) =>
+                          store.dispatch(DeleteTaskAction(deleteIndex: index))),
                   title: Text(todoTasks[index]),
                 );
               }),
         )),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => _displayDialog(context, store),
-          tooltip: 'Increment',
+          onPressed: () => _displayAddDialog(context, store),
           child: Icon(Icons.add),
         ),
       ),
     );
+  }
+}
+
+extension IndexedMap<T, E> on List<T> {
+  List<E> indexedMap<E>(E Function(int index, T item) function) {
+    List<E> list = [];
+    this.asMap().forEach((index, element) {
+      list.add(function(index, element));
+    });
+    return list;
   }
 }
