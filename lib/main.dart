@@ -44,7 +44,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp(this.store);
   final Store store;
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -194,8 +193,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    // TODO: DBの初期化
     print("initState");
     _dbProvider = DbProvider();
     store.dispatch(SyncTaskAction());

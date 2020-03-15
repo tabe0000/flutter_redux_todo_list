@@ -4,12 +4,11 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class DbProvider {
-  // DBのインスタンスはDatabaseで定義します
   static Database _db;
   Future<Database> get db async {
     if (_db != null) return _db;
-    await init();
 
+    await init();
     return _db;
   }
 
